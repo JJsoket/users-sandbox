@@ -3,10 +3,6 @@ package com.users.sendbox.service;
 import com.users.sendbox.model.AppUser;
 import com.users.sendbox.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,7 +10,7 @@ import java.util.List;
 
 @Service
 @Transactional
-public class UserService implements UserDetailsService {
+public class UserService {
     @Autowired
     private UserRepository repository;
 
@@ -28,8 +24,13 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional(readOnly = true)
-    public AppUser get(String name) {
-        return repository.findByUsername(name);
+    public AppUser get(String field, String value) {
+        if (field.equals("username")) {
+            return repository.findByUsername(value);
+        } else if (field.equals("email")) {
+            return repository.findByEmail(value);
+        }
+        return null;
     }
 
     public void delete(int id) {
@@ -38,19 +39,6 @@ public class UserService implements UserDetailsService {
 
     public void delete(String username) {
         repository.deleteByUsername(username);
-    }
-
-    @Override
-    public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
-        AppUser appUser = repository.findByUsername(userName);
-        if (appUser == null) {
-            throw new UsernameNotFoundException(userName);
-        }
-        return User.builder()
-                .username(appUser.getUsername())
-                .password(appUser.getPassword())
-                .roles("USER")
-                .build();
     }
 
 }

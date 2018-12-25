@@ -12,5 +12,7 @@ public interface UserRepository extends CrudRepository<AppUser, Integer> {
 
     AppUser findByUsername(String username);
 
+    AppUser findByEmail(String email);
+
     void deleteByUsername(String username);
 }
